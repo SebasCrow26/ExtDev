@@ -1,0 +1,384 @@
+# Parámetros compartidos del proyecto. Ningún script debe escribir estos valores dentro del código.
+#
+# Cada parámetro es un bloque con:
+#   valor          el valor que usa el código
+#   unidad         unidad física o forma del valor
+#   tipo           dato_clarios (viene de Clarios) | supuesto (decisión sin confirmación de Clarios)
+#                  | metodologico (decisión técnica de análisis) | tecnico (ruta o formato)
+#   descripcion    qué controla
+#   justificacion  por qué se eligió este valor por defecto
+#   advertencia    obligatoria si tipo es supuesto: qué no se puede concluir mientras sea un supuesto
+#
+# En Python se lee con:  from src.comun.config import cargar_config  (devuelve solo los `valor`)
+# La tabla legible está en documentacion/13_parametros.md (se genera con tools/generar_diccionario.py).
+# Lo que no se pueda confirmar con Clarios queda aquí como supuesto, visible y editable.
+
+turnos:
+  valor:
+    1: {inicio: "06:00", fin: "14:00"}
+    2: {inicio: "14:00", fin: "22:00"}
+    3: {inicio: "22:00", fin: "06:00"}
+  unidad: "hora del día (HH:MM); la fecha de cada turno es la de su inicio"
+  tipo: supuesto
+  descripcion: "Horario de los tres turnos con que se agregan energía y producción."
+  justificacion: "El triturado arranca de golpe a las 6:00 y el ERP concentra los registros de producción a las 5, 13 y 21 horas, al cierre de cada turno."
+  advertencia: "Clarios no entregó el calendario de turnos ni el de paradas. Toda cifra por turno depende de este supuesto. Los tres turnos deben durar 8 horas (el contrato de datos lo supone)."
+
+tarifas:
+  tarifa_kwh_cop:
+    valor: 542.475
+    unidad: "COP por kWh"
+    tipo: dato_clarios
+    descripcion: "Costo del kWh para convertir energía en pesos."
+    justificacion: "Media simple de la tarifa mensual de Clarios de octubre de 2025 a julio de 2026 (10 meses, rango 523.28 a 568.46; data/clean/tarifa_kwh_mensual.csv)."
+    advertencia: "No está ponderada por consumo y faltan agosto y septiembre de 2026. Solo se debe aplicar a energía del mismo alcance y periodo que la tarifa."
+  gas_cop_m3:
+    valor: 1799.419
+    unidad: "COP por m3"
+    tipo: dato_clarios
+    descripcion: "Costo del gas para convertir m3 en pesos."
+    justificacion: "Costo de la base de Clarios (hoja RC GAS) de enero a junio de 2026; de octubre a diciembre de 2025 fue 1681.7."
+    advertencia: "El gas del SCADA no es conciliable con la base de Clarios; no usar este costo para el gas total de la planta."
+
+unidades:
+  contador_energia_a_kwh:
+    valor: 0.001
+    unidad: "kWh por unidad del contador (1/1000, es decir, Wh a kWh)"
+    tipo: supuesto
+    descripcion: "Factor para convertir el acumulado de los contadores del SCADA a kWh."
+    justificacion: "Evidencia indirecta. En F&A, julio de 2026 da una razón de 0.95 a 0.97 frente a la base de Clarios. Si fuera GW (como informó Gabriel Castro), el consumo mensual sería unas 10^6 veces mayor."
+    advertencia: "La unidad de los contadores no está confirmada por Clarios. Las razones frente a la base en RC (0.49 a 1.24) no la confirman por sí solas."
+  erp_a_normalizada:
+    valor: {UN: unidades, KG: kg, L: litros, M3: m3}
+    unidad: "código de unidad del ERP a unidad normalizada"
+    tipo: metodologico
+    descripcion: "Traducción de las unidades de medida del ERP a las unidades de las tablas."
+    justificacion: "Son los códigos que aparecen en el archivo de transacciones del ERP."
+    advertencia: ""
+
+calidad:
+  cobertura_minima:
+    valor: 0.75
+    unidad: "fracción de las horas del turno con dato válido"
+    tipo: metodologico
+    descripcion: "Por debajo de esta cobertura el consumo del turno no se modela ni se reescala."
+    justificacion: "Permite hasta 2 horas inválidas en un turno de 8; con menos datos, reescalar a cobertura completa añade demasiado sesgo."
+    advertencia: ""
+  umbral_salto_x_p99:
+    valor: 20
+    unidad: "veces el percentil indicado del consumo horario del medidor"
+    tipo: metodologico
+    descripcion: "Un incremento del contador mayor a este múltiplo se trata como salto (dato no confiable)."
+    justificacion: "Deja pasar variaciones normales del proceso y marca saltos de un orden de magnitud; no se han visto saltos entre 5 y 20 veces."
+    advertencia: ""
+  percentil_salto:
+    valor: 0.99
+    unidad: "fracción (percentil)"
+    tipo: metodologico
+    descripcion: "Percentil de los incrementos horarios positivos sobre el que se mide el umbral de salto."
+    justificacion: "Robusto a unos pocos valores extremos."
+    advertencia: ""
+  umbral_hueco_interpolable_horas:
+    valor: 1.5
+    unidad: "horas entre lecturas"
+    tipo: metodologico
+    descripcion: "Un intervalo entre lecturas mayor a este valor se marca como hueco (interpolado, estimado o faltante)."
+    justificacion: "El paso nominal del SCADA es 1 hora; 1.5 deja tolerancia por el corrimiento del minuto de lectura."
+    advertencia: ""
+  max_horas_interpolar:
+    valor: 6
+    unidad: "horas"
+    tipo: metodologico
+    descripcion: "Los huecos de lectura más largos que esto quedan como faltantes en lugar de repartirse linealmente."
+    justificacion: "Un reparto lineal de hasta 6 horas distorsiona poco un turno; más allá se perdería la forma del consumo."
+    advertencia: ""
+  min_intervalos_congelado:
+    valor: 3
+    unidad: "intervalos horarios seguidos"
+    tipo: metodologico
+    descripcion: "Horas seguidas con TODOS los medidores de proceso sin cambiar para declarar el SCADA congelado."
+    justificacion: "Con medidores acumulados de energía, que ninguno cambie durante 3 horas seguidas es muy improbable en operación normal."
+    advertencia: ""
+  cobertura_mes_completo:
+    valor: 0.98
+    unidad: "fracción de las horas posibles del mes"
+    tipo: metodologico
+    descripcion: "Un mes se considera completo para conciliar con la base de Clarios si tiene al menos esta fracción de horas."
+    justificacion: "Excluye los meses de los extremos del archivo, que están incompletos."
+    advertencia: ""
+
+# Rachas de contador sin cambio, por medidor (documentacion/04_supuestos_y_limitaciones.md, "Rachas sin cambio por medidor")
+rachas:
+  factor_recuperacion_p99:
+    valor: 1.5
+    unidad: "veces el percentil 99 del consumo horario del medidor"
+    tipo: metodologico
+    descripcion: "Tras una racha sin cambio, si el primer incremento del contador supera este múltiplo, la energía acumulada reapareció de golpe: el SCADA se congeló y el medidor siguió contando."
+    justificacion: "Una sola hora de operación normal no supera el percentil 99 del propio medidor; los incrementos de reaparición observados son de 4 a 30 veces ese percentil, así que 1.5 deja un margen amplio sin confundir una reanudación normal."
+    advertencia: "Si el incremento posterior es menor que este umbral no se puede distinguir un congelamiento corto de un paro real: la racha queda sin corregir."
+  corregir_congelamiento_por_medidor:
+    valor: 1
+    unidad: "1 = sí, 0 = no"
+    tipo: metodologico
+    descripcion: "Si vale 1, una racha de un medidor con reaparición de energía se marca como estimada y se reparte (igual que el congelamiento de toda la planta); si vale 0 solo se clasifica."
+    justificacion: "Sin esta corrección, las horas congeladas salen con consumo cero marcado como válido y toda la energía acumulada cae en una o dos horas posteriores."
+    advertencia: "El reparto es uniforme en el periodo: sirve para totales diarios o mensuales, no para análisis por hora o por turno (las horas estimadas se excluyen de los turnos)."
+  razon_recuperacion_alta_min:
+    valor: 0.5
+    unidad: "fracción de la energía esperada en el periodo"
+    tipo: metodologico
+    descripcion: "Confianza alta en un congelamiento: la energía que reaparece es al menos esta fracción de lo que consumiría el medidor, en promedio, en el mismo periodo."
+    justificacion: "Si reaparece una parte importante de lo esperado, el contador sí siguió acumulando. El valor de referencia (promedio de ±14 días) incluye paros, por eso se acepta desde 0.5."
+    advertencia: ""
+  razon_recuperacion_alta_max:
+    valor: 2.0
+    unidad: "veces la energía esperada en el periodo"
+    tipo: metodologico
+    descripcion: "Confianza alta en un congelamiento: la energía que reaparece no excede este múltiplo de lo esperado."
+    justificacion: "Una reaparición mucho mayor a lo esperado sugiere que además hubo un salto o un reinicio, y la confianza baja a media."
+    advertencia: ""
+  fraccion_medidores_quietos:
+    valor: 0.8
+    unidad: "fracción de los medidores de proceso de la planta"
+    tipo: metodologico
+    descripcion: "Una racha afecta a toda la planta si al menos esta fracción de los medidores de proceso estuvo sin cambio durante la racha."
+    justificacion: "Con 7 medidores en RC, 0.8 exige 6; con 3 en F&A exige 3. Permite que un medidor de consumo mínimo se mueva sin ocultar un congelamiento general."
+    advertencia: ""
+  actividad_planta_activa:
+    valor: 0.5
+    unidad: "fracción del consumo típico de los demás medidores"
+    tipo: metodologico
+    descripcion: "Sin reaparición de energía, si los demás medidores consumen al menos esta fracción de lo típico, la planta estaba operando y la racha de un medidor es sospechosa."
+    justificacion: "Separa un paro real de la planta (todos bajan) de un medidor aislado sin variación (apagado, atascado o sin transmitir)."
+    advertencia: "Con un contador acumulado no se puede distinguir un consumo cero real de un medidor atascado sin reaparición posterior; se reporta como indeterminado."
+  umbral_bajo_consumo_kwh_h:
+    valor: 5
+    unidad: "kWh por hora (promedio típico del medidor)"
+    tipo: metodologico
+    descripcion: "Un medidor cuyo consumo horario típico es menor a este valor puede quedar sin cambio varias horas por la resolución del contador o consumo de reposo."
+    justificacion: "REFINO_2 promedia 0.2 a 1.2 kWh/h (percentil 95: 2.8) frente a 14 kWh/h o más en los demás medidores de RC; 49 de sus 51 rachas de 6 h o más duran menos de 48 horas."
+    advertencia: "Es un criterio por orden de magnitud y no por especificación del medidor; la resolución real del contador no está confirmada por Clarios."
+  max_horas_bajo_consumo:
+    valor: 48
+    unidad: "horas"
+    tipo: metodologico
+    descripcion: "Las rachas sin cambio de un medidor de bajo consumo que duran más que esto se tratan como sospechosas, no como comportamiento normal."
+    justificacion: "El comportamiento normal observado de REFINO_2 llega a 44 horas; una racha de 559 horas (23 días) no se explica por la resolución del contador."
+    advertencia: ""
+  ventana_referencia_dias:
+    valor: 14
+    unidad: "días a cada lado de la racha"
+    tipo: metodologico
+    descripcion: "Ventana para calcular el consumo típico del medidor alrededor de una racha (sin contar la racha)."
+    justificacion: "Dos semanas a cada lado cubren dos ciclos semanales de operación y paros."
+    advertencia: "El promedio incluye horas de paro, así que subestima el consumo en operación; la razón de reaparición se interpreta como orden de magnitud."
+
+produccion:
+  dias_desfase_fecha_efectiva:
+    valor: 2
+    unidad: "días"
+    tipo: metodologico
+    descripcion: "Una transacción registrada con esta diferencia o más respecto de su fecha efectiva se asigna a la fecha efectiva."
+    justificacion: "El 83 % de las diferencias es de un día y corresponde a transacciones de la noche (el ERP les pone el día siguiente); los registros tardíos reales son de 2 días o más."
+    advertencia: ""
+  prefijos_planta:
+    valor: [[ENSLIN, Ensamble], [OEMP, OREC], [ORECRJ, OREC], [ORECPOX, OREC], [OCINTA, OREC], [RC, RC], [FA, "F&A"], [POL, Componentes], [MAQ, Componentes]]
+    unidad: "prefijo del código de línea a planta"
+    tipo: metodologico
+    descripcion: "Planta de las líneas que no están en el mapa de líneas de Clarios."
+    justificacion: "Replica la convención de nombres de los códigos de línea del ERP. El mapa de Clarios tiene prioridad."
+    advertencia: ""
+
+gas:
+  hueco_estimado_horas:
+    valor: 36
+    unidad: "horas entre lecturas"
+    tipo: metodologico
+    descripcion: "Un hueco de lecturas de gas mayor a esto marca los días de su interior como estimados."
+    justificacion: "Las lecturas son diarias; 36 horas permite un día de retraso sin marcar estimación."
+    advertencia: ""
+  tolerancia_medianoche_s:
+    valor: 5
+    unidad: "segundos"
+    tipo: metodologico
+    descripcion: "Las lecturas diarias caen unos segundos antes o después de la medianoche; se tratan como si fueran a la medianoche."
+    justificacion: "Las lecturas del SCADA llegan hasta 3 segundos de diferencia con la medianoche."
+    advertencia: ""
+
+calendario:
+  pais_festivos:
+    valor: CO
+    unidad: "código de país de la librería holidays"
+    tipo: supuesto
+    descripcion: "Calendario de festivos con que se calcula `es_festivo`."
+    justificacion: "Las plantas están en Colombia."
+    advertencia: "Es el calendario oficial del país, no el calendario laboral de Clarios (puede haber puentes, paradas o jornadas distintas)."
+
+modelado:
+  procesos_asociados:
+    valor: {filtros: refinacion, ptari: refinacion}
+    unidad: "proceso sin línea de producción propia a proceso cuya producción se le asocia"
+    tipo: supuesto
+    descripcion: "Los procesos de apoyo sin línea en el ERP reciben la producción de refinación."
+    justificacion: "No tienen línea propia en el mapa de Clarios; su consumo es casi constante."
+    advertencia: "La producción de refinación queda repetida en tres procesos: no sumar producción entre procesos. Es solo una referencia; la relación estadística es débil (0.33 y 0.20 por semana)."
+  operando_multiplo_p5:
+    valor: 3
+    unidad: "veces el percentil 5 del consumo del proceso"
+    tipo: supuesto
+    descripcion: "Primer criterio de `operando`; el consumo del turno debe superar el mayor entre este criterio y el siguiente."
+    justificacion: "Separa el consumo en reposo del consumo en operación en los procesos que se apagan."
+    advertencia: "Sin calendario de Clarios, `operando` se infiere del propio consumo: no usarlo como variable explicativa del consumo (fuga de información)."
+  operando_fraccion_p95:
+    valor: 0.1
+    unidad: "fracción del percentil 95 del consumo del proceso"
+    tipo: supuesto
+    descripcion: "Segundo criterio de `operando`."
+    justificacion: "Evita tomar como operación un consumo residual cuando el percentil 5 es casi cero."
+    advertencia: "Igual que `operando_multiplo_p5`."
+
+eda:
+  kmeans_k:
+    valor: 4
+    unidad: "número de regímenes"
+    tipo: metodologico
+    descripcion: "Grupos del clustering exploratorio de regímenes de operación."
+    justificacion: "Con 4 grupos se obtiene una lectura clara (parada, reducido, normal, alto); el silhouette es moderado (0.31)."
+    advertencia: ""
+  semilla:
+    valor: 0
+    unidad: "semilla aleatoria"
+    tipo: tecnico
+    descripcion: "Semilla de las partes aleatorias del análisis exploratorio, para que sea reproducible."
+    justificacion: "Resultados idénticos en cada ejecución."
+    advertencia: ""
+  contaminacion_isolation_forest:
+    valor: 0.02
+    unidad: "fracción de turnos marcados como anómalos"
+    tipo: metodologico
+    descripcion: "Proporción esperada de anomalías del Isolation Forest."
+    justificacion: "Marca los turnos más extremos sin llenar el informe de falsos positivos."
+    advertencia: ""
+  n_anomalias_candidatas:
+    valor: 25
+    unidad: "turnos"
+    tipo: metodologico
+    descripcion: "Cuántos turnos candidatos a anomalía se listan."
+    justificacion: "Lista corta y revisable a mano."
+    advertencia: ""
+  piso_mad_kwh:
+    valor: 1.0
+    unidad: "kWh"
+    tipo: metodologico
+    descripcion: "Constante sumada a la desviación absoluta mediana para no dividir por cero en procesos casi constantes."
+    justificacion: "Un kWh es despreciable frente a los consumos de los procesos."
+    advertencia: ""
+
+mapa_procesos:
+  valor:
+    - {planta: RC, proceso_modelo: triturado, medidores_scada: [TRITURADO], lineas_erp: [RCTRIT01], unidad_produccion: kg, modelar: true, nota: ""}
+    - {planta: RC, proceso_modelo: horno, medidores_scada: [HORNO], lineas_erp: [RCFUND02], unidad_produccion: kg, modelar: true, nota: ""}
+    - {planta: RC, proceso_modelo: refinacion, medidores_scada: [REFINO_1, REFINO_2], lineas_erp: [RCREFI01, RCREFI02, RCREFI03], unidad_produccion: kg, modelar: true, nota: "3 líneas de refinación para 2 medidores"}
+    - {planta: RC, proceso_modelo: filtros, medidores_scada: [FILTRO_1, FILTRO_2], lineas_erp: [], unidad_produccion: kg, modelar: true, nota: "sin línea propia; se modela contra refinacion (supuesto)"}
+    - {planta: RC, proceso_modelo: ptari, medidores_scada: [PTARI], lineas_erp: [], unidad_produccion: kg, modelar: true, nota: "sin línea propia; se modela contra refinacion (supuesto)"}
+    - {planta: RC, proceso_modelo: acometida_emcali, medidores_scada: [EMCALI], lineas_erp: [], unidad_produccion: "", modelar: false, nota: "alcance y unidad por confirmar con Clarios; solo registra desde marzo de 2026"}
+    - {planta: RC, proceso_modelo: edificio_admon, medidores_scada: [EDIF_ADMON], lineas_erp: [], unidad_produccion: "", modelar: false, nota: "alcance y unidad por confirmar con Clarios; solo registra desde marzo de 2026"}
+    - {planta: "F&A", proceso_modelo: formacion, medidores_scada: [RECTIFICADOR_1, RECTIFICADOR_2, RECTIFICADOR_3], lineas_erp: [FAFORM02], unidad_produccion: unidades, modelar: true, nota: "unidad del contador por confirmar"}
+    - {planta: "F&A", proceso_modelo: acabado, medidores_scada: [], lineas_erp: [FADECO03], unidad_produccion: unidades, modelar: false, nota: "sin medidor de energía"}
+  unidad: "relación entre proceso, medidores del SCADA y líneas del ERP"
+  tipo: supuesto
+  descripcion: "Mapa de procesos de modelado. Los nombres de líneas salen del mapa de Clarios; la relación con los medidores es una decisión del equipo."
+  justificacion: "Cada medidor de proceso se asocia al proceso que lo nombra. Refinación suma dos medidores y tres líneas."
+  advertencia: "La correspondencia exacta entre medidores y líneas no fue confirmada por Clarios. Los medidores de RC cubren entre el 49 % y el 124 % de lo que reporta la base mensual (mediana 62 %), así que no son todo el consumo de la planta."
+
+semaforo:
+  verde_hasta_pct:
+    valor: 5
+    unidad: "porcentaje de exceso sobre lo esperado"
+    tipo: supuesto
+    descripcion: "Hasta este exceso el indicador del dashboard es verde."
+    justificacion: "Umbral provisional del equipo."
+    advertencia: "Clarios no definió umbrales. Ajustar con el criterio de Clarios."
+  amarillo_hasta_pct:
+    valor: 10
+    unidad: "porcentaje de exceso sobre lo esperado"
+    tipo: supuesto
+    descripcion: "Hasta este exceso es amarillo; por encima, rojo."
+    justificacion: "Umbral provisional del equipo."
+    advertencia: "Clarios no definió umbrales. Ajustar con el criterio de Clarios."
+
+alertas:
+  turnos_consecutivos_exceso:
+    valor: 2
+    unidad: "turnos seguidos"
+    tipo: supuesto
+    descripcion: "Turnos seguidos con exceso para disparar la alerta de exceso sostenido."
+    justificacion: "Evita alertar por un solo turno atípico."
+    advertencia: "Umbral provisional del equipo, sin respaldo de Clarios."
+
+modelos:
+  inicio_entrenamiento:
+    valor: "2025-10-01"
+    unidad: "fecha"
+    tipo: metodologico
+    descripcion: "Inicio del periodo de entrenamiento de los modelos."
+    justificacion: "Primer día con producción del ERP."
+    advertencia: ""
+  fin_entrenamiento:
+    valor: "2026-06-30"
+    unidad: "fecha"
+    tipo: metodologico
+    descripcion: "Fin del periodo de entrenamiento."
+    justificacion: "Reserva julio a septiembre de 2026 para probar con datos que el modelo no vio."
+    advertencia: ""
+  inicio_prueba:
+    valor: "2026-07-01"
+    unidad: "fecha"
+    tipo: metodologico
+    descripcion: "Inicio del periodo de prueba."
+    justificacion: "Separación por tiempo, nunca aleatoria."
+    advertencia: ""
+  fin_prueba:
+    valor: "2026-09-30"
+    unidad: "fecha"
+    tipo: metodologico
+    descripcion: "Fin del periodo de prueba."
+    justificacion: "Último día con producción del ERP."
+    advertencia: ""
+  fraccion_evitable:
+    valor: 0.5
+    unidad: "fracción del exceso"
+    tipo: supuesto
+    descripcion: "Parte del exceso de consumo que se considera evitable para estimar ahorro potencial."
+    justificacion: "Relleno sin respaldo; solo permite construir un escenario."
+    advertencia: "No hay base para este valor. Cualquier ahorro calculado con él es un escenario, no un ahorro demostrado."
+  percentil_meta:
+    valor: 25
+    unidad: "percentil del kWh por unidad"
+    tipo: metodologico
+    descripcion: "Percentil histórico que se usa como meta cuando Clarios no entrega una."
+    justificacion: "Representa un buen desempeño alcanzable según el propio historial."
+    advertencia: ""
+  horizonte_pronostico_dias:
+    valor: 7
+    unidad: "días después del último dato"
+    tipo: metodologico
+    descripcion: "Cuántos días hacia adelante se pronostica el consumo por proceso y escenario."
+    justificacion: "Una semana cubre los dos días de fin de semana y alcanza para el tablero; más allá, sin un plan de producción de Clarios, solo se repetiría el supuesto."
+    advertencia: "La producción supuesta de cada día es el promedio del mismo día de la semana en las últimas 4 semanas por un factor de escenario (0.85, 1.0, 1.15); no es un plan de Clarios."
+
+rutas:
+  datos_reales:
+    valor: data/clean
+    unidad: "ruta relativa a la raíz del repositorio"
+    tipo: tecnico
+    descripcion: "Carpeta de las tablas limpias."
+    justificacion: "Convención del proyecto."
+    advertencia: ""
+  datos_ejemplo:
+    valor: datos_simulados
+    unidad: "ruta relativa a la raíz del repositorio"
+    tipo: tecnico
+    descripcion: "Carpeta de los datos de ejemplo (sintéticos)."
+    justificacion: "Convención del proyecto."
+    advertencia: ""

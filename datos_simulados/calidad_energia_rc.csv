@@ -1,0 +1,8 @@
+medidor,lecturas,reinicios,saltos,huecos_largos,huecos_interpolados,congelamientos_repartidos,umbral_salto_wh_por_intervalo,horas_ok,horas_interpolado,horas_estimado,horas_faltante,horas_salto,horas_reinicio,horas_total,pct_horas_ok_o_interpoladas
+TRITURADO,8743,12,0,0,0,2,1747776.000000003,8714,0,44,0,0,24,8782,99.2
+HORNO,8743,1,0,0,0,2,3425609.0000000014,8736,0,44,0,0,2,8782,99.5
+REFINO_1,8743,12,0,0,0,2,1285867.9999999988,8714,0,44,0,0,24,8782,99.2
+REFINO_2,8743,12,0,0,0,2,39771.99999999997,8714,0,44,0,0,24,8782,99.2
+FILTRO_1,8743,3,0,0,0,2,4576411.200000007,8732,0,44,0,0,6,8782,99.4
+FILTRO_2,8723,10,0,0,0,3,1608983.1999999979,8696,0,66,0,0,20,8782,99.0
+PTARI,8743,1,0,0,0,2,914843.2000000004,8736,0,44,0,0,2,8782,99.5

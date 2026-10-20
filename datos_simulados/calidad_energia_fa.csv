@@ -1,0 +1,4 @@
+medidor,lecturas,reinicios,saltos,huecos_largos,huecos_interpolados,congelamientos_repartidos,umbral_salto_wh_por_intervalo,horas_ok,horas_interpolado,horas_estimado,horas_faltante,horas_salto,horas_reinicio,horas_total,pct_horas_ok_o_interpoladas
+RECTIFICADOR_1,2138,0,0,0,0,1,19682980.000000007,2134,0,29,0,0,0,2163,98.7
+RECTIFICADOR_2,2078,0,0,0,0,2,19741730.39999998,2072,0,91,0,0,0,2163,95.8
+RECTIFICADOR_3,2138,0,0,0,0,1,16871132.000000007,2134,0,29,0,0,0,2163,98.7

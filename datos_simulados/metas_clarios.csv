@@ -1,0 +1,4 @@
+planta,kwh_por_eq_meta,vigente_desde,vigente_hasta,meses,fuente
+Ensamble,2.0,2025-10-01,2026-07-01,10,Datos simulados (presupuesto inventado)
+F&A,18.0,2025-10-01,2026-07-01,10,Datos simulados (presupuesto inventado)
+OREC,5.8,2025-10-01,2026-06-01,9,Datos simulados (presupuesto inventado)

@@ -1,0 +1,10 @@
+planta,proceso_modelo,medidores_scada,lineas_erp,unidad_produccion,nota
+RC,triturado,TRITURADO,RCTRIT01,kg,
+RC,horno,HORNO,RCFUND02,kg,
+RC,refinacion,REFINO_1;REFINO_2,RCREFI01;RCREFI02;RCREFI03,kg,3 líneas de refinación para 2 medidores
+RC,filtros,FILTRO_1;FILTRO_2,,kg,sin línea propia; se modela contra refinacion (supuesto)
+RC,ptari,PTARI,,kg,sin línea propia; se modela contra refinacion (supuesto)
+RC,acometida_emcali,EMCALI,,,alcance y unidad por confirmar con Clarios; solo registra desde marzo de 2026
+RC,edificio_admon,EDIF_ADMON,,,alcance y unidad por confirmar con Clarios; solo registra desde marzo de 2026
+F&A,formacion,RECTIFICADOR_1;RECTIFICADOR_2;RECTIFICADOR_3,FAFORM02,unidades,unidad del contador por confirmar
+F&A,acabado,,FADECO03,unidades,sin medidor de energía

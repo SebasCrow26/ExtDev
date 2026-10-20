@@ -1,0 +1,7 @@
+planta,proceso_modelo,meta_kwh_por_unidad,fuente,vigente_desde
+RC,triturado,0.0041,historico_p25,2025-10-01
+RC,horno,0.0186,historico_p25,2025-10-01
+RC,refinacion,0.0068,historico_p25,2025-10-01
+RC,filtros,0.0431,historico_p25,2025-10-01
+RC,ptari,0.0058,historico_p25,2025-10-01
+F&A,formacion,4.5341,historico_p25,2026-07-03

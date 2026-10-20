@@ -1,0 +1,12 @@
+pandas>=2.2
+numpy>=1.26
+scipy>=1.11
+scikit-learn>=1.4
+statsmodels>=0.14
+plotly>=5.20
+streamlit>=1.35
+pyyaml>=6.0
+openpyxl>=3.1
+python-calamine>=0.2
+matplotlib>=3.8
+holidays>=0.50
