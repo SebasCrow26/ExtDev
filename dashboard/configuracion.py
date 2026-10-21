@@ -1,4 +1,4 @@
-"""Utilidades compartidas: leer config.yaml y cargar exclusivamente tablas sintéticas."""
+"""Utilidades compartidas: leer config.yaml y cargar tablas (sintéticas por defecto; reales solo en local con CLARIOS_DATOS_REALES)."""
 import os
 from pathlib import Path
 

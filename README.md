@@ -6,7 +6,7 @@ Repositorio de demostración con un dashboard ejecutivo y una vista de monitoreo
 |---|---|
 | `dashboard/` | Aplicaciones Streamlit, configuración, estilos y tablas sintéticas. |
 | `modelos/` | API y artefacto de los modelos que requiere el dashboard. |
-| `documentacion/` | Contrato, diccionario, supuestos y guía del dashboard. |
+| `documentacion/` | Contrato, diccionario, parámetros, supuestos y limitaciones, y guía del dashboard. |
 | `presentacion/` | Material de presentación. |
 
 ## Ejecutar
@@ -28,8 +28,6 @@ Para ver las tablas reales de Clarios, se apunta la variable `CLARIOS_DATOS_REAL
 
 ```powershell
 $env:CLARIOS_DATOS_REALES = "C:\ruta\a\las\tablas"
-uta\las	ablas"
-uta\las	ablas"
 streamlit run dashboard/app.py
 ```
 
@@ -38,8 +36,11 @@ Las pantallas muestran entonces los datos reales y el monitoreo en vivo parte de
 ## Datos y privacidad
 
 - Por defecto, y en cualquier despliegue público, el lector de tablas carga solo `dashboard/datos_simulados/`. Solo lee otra carpeta si se define `CLARIOS_DATOS_REALES` en la máquina local; las tablas reales no están en este repositorio.
-- `.gitignore` excluye carpetas locales de datos, secretos y archivos temporales.
 - Las pantallas usan las tablas sintéticas como datos de entrada y cargan el estimador versionado en `modelos/modelos.pkl`. Ese artefacto fue entrenado previamente con datos de Clarios; contiene parámetros del modelo, no las tablas originales.
 - Con los datos simulados, los valores, fechas y eventos son demostrativos y no representan consumos, costos ni metas reales de Clarios.
 
-Consulta [la guía sintética del dashboard](documentacion/17_guia_dashboard_sintetico.md) y [los supuestos de la demo](documentacion/04_supuestos_y_limitaciones.md).
+## Uso de IA
+
+La documentación y parte del código de este repositorio se desarrollaron con ayuda de inteligencia artificial (Claude, de Anthropic). Todo el contenido fue verificado de antemano por el equipo.
+
+Consulta [la guía del dashboard](documentacion/17_guia_dashboard_sintetico.md) y [los supuestos y limitaciones](documentacion/04_supuestos_y_limitaciones.md).

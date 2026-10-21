@@ -372,6 +372,6 @@ rutas:
     valor: datos_simulados
     unidad: "ruta relativa a dashboard/"
     tipo: tecnico
-    descripcion: "Carpeta unica de datos sinteticos para la demostracion."
-    justificacion: "El lector de tablas solo consulta esta carpeta."
-    advertencia: "No se cargan archivos de datos reales."
+    descripcion: "Carpeta de datos sinteticos para la demostracion (la que usa el despliegue publico)."
+    justificacion: "El lector de tablas consulta esta carpeta por defecto."
+    advertencia: "Solo en una maquina local, la variable de entorno CLARIOS_DATOS_REALES permite leer las tablas reales de otra carpeta; esos datos no van en el repositorio."

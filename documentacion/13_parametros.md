@@ -4,7 +4,7 @@ La configuracion de `dashboard/config.yaml` contiene supuestos tecnicos y valore
 
 Las tarifas, metas, umbrales, turnos y factores de conversion de esta copia son ficticios o metodologicos. No son parametros operativos ni financieros de Clarios. Cambiarlos solo afecta la demostracion sintetica.
 
-El cargador del dashboard lee exclusivamente la carpeta `dashboard/datos_simulados/`. No agregues aqui archivos de `data/clean/`, exportaciones de planta, credenciales ni modelos serializados entrenados con informacion real.
+El cargador del dashboard lee por defecto la carpeta `dashboard/datos_simulados/`. Solo en una maquina local, la variable de entorno `CLARIOS_DATOS_REALES` puede apuntar a otra carpeta con las tablas reales. No agregues al repositorio archivos de datos reales, exportaciones de planta ni credenciales. El unico artefacto entrenado con informacion de Clarios es `modelos/modelos.pkl`, que contiene parametros del modelo y no las filas originales.
 
 ## Ejecutar
 
