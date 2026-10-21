@@ -14,6 +14,7 @@ if str(RAIZ) not in sys.path:
     sys.path.insert(0, str(RAIZ))
 
 from dashboard.datos import get_config
+from dashboard import pagina_monitoreo
 from dashboard.estilos import aplicar_estilos_css
 from dashboard.paginas import (
     alertas,
@@ -68,7 +69,8 @@ def main():
             "3.4 Pronóstico": ("Pronóstico", pronostico.render),
             "3.5 Plantas Mensual": ("Plantas", plantas.render),
             "3.6 Gas Refinación": ("Gas de refinación", gas.render),
-            "3.7 Calidad & Supuestos": ("Calidad y supuestos", calidad.render)
+            "3.7 Calidad & Supuestos": ("Calidad y supuestos", calidad.render),
+            "3.8 Monitoreo en vivo": ("Monitoreo en vivo", lambda filtros: pagina_monitoreo.mostrar()),
         }
         seleccion = st.session_state.get("pagina_dashboard_activa", "3.1 Resumen RC")
         for clave_pagina, (etiqueta, _) in paginas_opciones.items():

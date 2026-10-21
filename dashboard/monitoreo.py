@@ -1,4 +1,13 @@
-"""Simulador de monitoreo en vivo sobre datos y eventos sintéticos. No consulta datos locales ni modelos serializados."""
+"""Motor del monitoreo en vivo (simulado).
+
+Imita lo que pasaría en planta: cada hora llega la lectura de los contadores acumulados del SCADA (en Wh), se limpia con las mismas
+reglas del proyecto (reinicios, congelamientos), se arma el consumo de cada turno, se compara con el esperado del modelo entrenado
+y se evalúan el semáforo y las alertas (reglas de la guía del dashboard).
+
+No usa Streamlit. La página está en `pagina_monitoreo.py`.
+Los datos de partida son `resultados_modelo` y `dataset_modelo`: los reales si CLARIOS_DATOS_REALES apunta a su carpeta (solo en local), si no
+los sintéticos de dashboard/datos_simulados. Los modelos son los de `modelos/modelos.pkl`. Los datos que "llegan" son siempre inventados.
+"""
 from __future__ import annotations
 
 import sys
@@ -15,7 +24,7 @@ for ruta in (str(AQUI), str(RAIZ)):
         sys.path.insert(0, ruta)
 
 from configuracion import cargar_config, leer_tabla  # noqa: E402
-from modelos.modelo_esperado_api import predecir  # noqa: E402
+from modelos.modelo_esperado_api import cargar_modelos, features, predecir_modelo  # noqa: E402
 
 PROCESOS = ["triturado", "horno", "refinacion", "filtros", "ptari"]
 MEDIDORES = {"triturado": {"TRITURADO": 1.0}, "horno": {"HORNO": 1.0}, "refinacion": {"REFINO_1": 0.97, "REFINO_2": 0.03},
@@ -26,7 +35,7 @@ TIPOS_EVENTO = ("exceso", "parada", "congelamiento", "reinicio")
 
 # Valores de la guía del dashboard (docs/17, sección 5). Son parámetros editables en la interfaz.
 PARAMETROS = {"alerta_turnos": 3, "alerta_pct": 10.0, "alerta_costo_cop": 100_000.0, "semaforo_amarillo": 5.0, "semaforo_rojo": 10.0,
-              "ventana_semaforo_turnos": 21, "cobertura_minima": 0.75, "min_horas_congelamiento": 3, "tarifa": 500.0}
+              "ventana_semaforo_turnos": 21, "cobertura_minima": 0.75, "min_horas_congelamiento": 3, "tarifa": 529.6}
 
 
 def turno_y_fecha(ts: pd.Timestamp) -> tuple[pd.Timestamp, int]:
@@ -52,10 +61,11 @@ class MotorEnVivo:
         self.p["tarifa"] = float((parametros or {}).get("tarifa", cfg["tarifas"]["tarifa_kwh_cop"]))
         self.p["cobertura_minima"] = float((parametros or {}).get("cobertura_minima", cfg["calidad"]["cobertura_minima"]))
         self.p["min_horas_congelamiento"] = int((parametros or {}).get("min_horas_congelamiento", cfg["calidad"]["min_intervalos_congelado"]))
+        self.modelos = cargar_modelos()
         self.festivos = holidays.country_holidays(cfg["calendario"]["pais_festivos"], years=range(2025, 2028))
 
         res = leer_tabla("resultados_modelo")
-        self.fuente = "datos sintéticos"
+        self.fuente = "datos reales de Clarios" if res.attrs.get("fuente") == "real" else "datos sintéticos"
         dm = leer_tabla("dataset_modelo")
         dm = dm[dm["proceso_modelo"].isin(PROCESOS) & (dm["calidad_ok"] == 1)]
         ultima = res["fecha_turno"].max()
@@ -115,15 +125,9 @@ class MotorEnVivo:
             tip = self.prod_tipica.get((p, cal["dia_semana"], turno), 0.0)
             prod = float(max(tip * self.rng.lognormal(0, 0.12), 0.0)) if tip > 0 else 0.0
             h = self.prod_hist[p]
-            esperado = predecir(
-                proceso=p,
-                produccion=prod,
-                nivel="turno",
-                fecha=fecha,
-                turno=turno,
-                produccion_t1=h[-1],
-                produccion_t2=h[-2],
-            )["kwh_esperado"]
+            tab = pd.DataFrame({"proceso_modelo": p, "produccion": [h[-2], h[-1], prod], "turno": [turno] * 3,
+                                "dia_semana": cal["dia_semana"], "es_fin_semana": cal["es_fin_semana"], "es_festivo": cal["es_festivo"]})
+            esperado = float(np.clip(predecir_modelo(self.modelos[f"turno|{p}"]["mejor"], features(tab, "turno")), 0, None)[-1])
             sd = 1.4826 * self.mad_res.get(p, 5.0)
             base = max(esperado + self.mediana_res.get(p, 0.0) + float(self.rng.normal(0, sd)), 0.0)
             perfil = np.clip(1 + self.rng.normal(0, 0.06, HORAS_TURNO), 0.5, None)

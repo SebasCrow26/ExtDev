@@ -3,7 +3,7 @@
 Se ejecuta sola:   streamlit run dashboard/pagina_monitoreo.py
 o se integra en el dashboard con `mostrar()`. Cada 5 segundos llegan una o más horas de lecturas del SCADA (inventadas), se limpian
 con las reglas del proyecto, se cierran los turnos y se recalculan el semáforo y las alertas. El motor está en `monitoreo.py`.
-La historia de partida se carga exclusivamente desde `dashboard/datos_simulados/`.
+Con CLARIOS_DATOS_REALES definida la historia de partida es la real (solo en local); si no, es sintética. Las lecturas que llegan son siempre inventadas.
 """
 import sys
 from pathlib import Path
@@ -31,9 +31,9 @@ def _motor(guion: bool = False, semilla: int = 2026) -> MotorEnVivo:
 
 
 def _barra_lateral(motor: MotorEnVivo) -> None:
-    with st.sidebar:
-        st.header("Control")
-        c1, c2 = st.columns(2)
+    with st.container(border=True):
+        st.markdown("**Controles de la simulación**")
+        c1, c2, c3 = st.columns([1, 1, 2])
         if c1.button("▶ Iniciar" if not st.session_state.get("corriendo") else "⏸ Pausar", width="stretch"):
             st.session_state["corriendo"] = not st.session_state.get("corriendo", False)
             st.rerun()
@@ -41,16 +41,18 @@ def _barra_lateral(motor: MotorEnVivo) -> None:
             st.session_state["reiniciar"] = True
             st.session_state["corriendo"] = False
             st.rerun()
-        st.session_state["horas_por_paso"] = st.select_slider("Horas simuladas por actualización", options=[1, 2, 4, 8], value=st.session_state.get("horas_por_paso", 1),
-                                                              help=f"Cada {INTERVALO_S} s de reloj real llegan estas horas de lecturas del SCADA.")
+        with c3:
+            st.session_state["horas_por_paso"] = st.select_slider("Horas simuladas por actualización", options=[1, 2, 4, 8], value=st.session_state.get("horas_por_paso", 1),
+                                                                  help=f"Cada {INTERVALO_S} s de reloj real llegan estas horas de lecturas del SCADA.")
         st.checkbox("Guion de la demostración al reiniciar", key="guion",
                     help="Programa un congelamiento del SCADA, un exceso sostenido en el horno, un reinicio de contador y una parada inesperada.")
 
-        st.subheader("Inyectar un evento ahora")
-        tipo = st.selectbox("Evento", TIPOS_EVENTO, format_func=ETIQUETA_EVENTO.get)
-        proceso = None if tipo == "congelamiento" else st.selectbox("Proceso", PROCESOS)
-        horas = None if tipo == "reinicio" else st.number_input("Horas", 1, 72, {"exceso": 24, "parada": 4, "congelamiento": 5}[tipo])
-        if st.button("Inyectar", width="stretch"):
+        st.markdown("Inyectar un evento ahora")
+        e1, e2, e3, e4 = st.columns([2, 2, 1, 1], vertical_alignment="bottom")
+        tipo = e1.selectbox("Evento", TIPOS_EVENTO, format_func=ETIQUETA_EVENTO.get)
+        proceso = None if tipo == "congelamiento" else e2.selectbox("Proceso", PROCESOS)
+        horas = None if tipo == "reinicio" else e3.number_input("Horas", 1, 72, {"exceso": 24, "parada": 4, "congelamiento": 5}[tipo])
+        if e4.button("Inyectar", width="stretch"):
             motor.inyectar(tipo, proceso, int(horas) if horas else None)
             st.toast(f"{ETIQUETA_EVENTO[tipo]} inyectado")
 
@@ -62,7 +64,7 @@ def _barra_lateral(motor: MotorEnVivo) -> None:
             p["alerta_costo_cop"] = st.number_input("Costo mínimo del episodio (COP)", 0.0, 5_000_000.0, float(p["alerta_costo_cop"]), step=50_000.0)
             p["semaforo_amarillo"] = st.number_input("Semáforo amarillo desde (%)", 0.0, 50.0, float(p["semaforo_amarillo"]))
             p["semaforo_rojo"] = st.number_input("Semáforo rojo desde (%)", 0.0, 100.0, float(p["semaforo_rojo"]))
-            st.caption("Umbrales y turnos ilustrativos para la demostración sintética.")
+            st.caption("Los umbrales son provisionales del equipo, sin respaldo de Clarios. Los turnos (06-14, 14-22, 22-06) son un supuesto.")
 
 
 def _tarjetas(motor: MotorEnVivo) -> None:
@@ -73,7 +75,7 @@ def _tarjetas(motor: MotorEnVivo) -> None:
         with col, st.container(border=True):
             st.markdown(f"<span style='color:{COLORES[s.color]};font-size:1.3em'>●</span> **{p.capitalize()}**", unsafe_allow_html=True)
             st.metric("Exceso neto (últimos 7 días)", f"{s.exceso_pct:+.1f} %" if pd.notna(s.exceso_pct) else "—",
-                      f"{s.costo_cop / 1e6:,.1f} M COP" if s.costo_cop else None, delta_color="inverse", help="Suma del real menos suma del esperado sobre los últimos 21 turnos válidos. Estimado desde la referencia mediana sintética.")
+                      f"{s.costo_cop / 1e6:,.1f} M COP" if s.costo_cop else None, delta_color="inverse", help="Suma del real menos suma del esperado sobre los últimos 21 turnos válidos. Sale del modelo entrenado.")
             frac = min(c.horas / HORAS_TURNO, 1.0)
             st.progress(frac, text=f"Turno {int(c.turno)} en curso: {int(c.horas)}/{HORAS_TURNO} h")
             if c.horas and pd.notna(c.razon):
