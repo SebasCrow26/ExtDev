@@ -27,7 +27,8 @@ En el monitoreo en vivo, **Iniciar** hace que cada 5 segundos lleguen las lectur
 Para ver las tablas reales de Clarios, se apunta la variable `CLARIOS_DATOS_REALES` a la carpeta con las tablas y se corre el dashboard:
 
 ```powershell
-$env:CLARIOS_DATOS_REALES = "C:uta\las	ablas"
+$env:CLARIOS_DATOS_REALES = "C:\ruta\a\las\tablas"
+uta\las	ablas"
 uta\las	ablas"
 streamlit run dashboard/app.py
 ```
