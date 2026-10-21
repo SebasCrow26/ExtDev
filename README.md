@@ -28,6 +28,7 @@ Para ver las tablas reales de Clarios, se apunta la variable `CLARIOS_DATOS_REAL
 
 ```powershell
 $env:CLARIOS_DATOS_REALES = "C:uta\las	ablas"
+uta\las	ablas"
 streamlit run dashboard/app.py
 ```
 
