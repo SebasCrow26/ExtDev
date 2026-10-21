@@ -116,7 +116,7 @@ def render(filtros: dict):
     submitted = False
     if nivel_sim == "Día":
         st.markdown("#### Producción planeada por turno")
-        st.caption("Turno 1: 22:00–06:00 · Turno 2: 06:00–14:00 · Turno 3: 14:00–22:00")
+        st.caption("Turno 1: 06:00–14:00 · Turno 2: 14:00–22:00 · Turno 3: 22:00–06:00")
         turno_cols = st.columns(3)
         produccion_turnos = {}
         for turno, columna in zip((1, 2, 3), turno_cols):

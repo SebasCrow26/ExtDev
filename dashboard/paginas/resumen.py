@@ -86,7 +86,7 @@ def render(filtros: dict):
             "Turnos",
             options=[1, 2, 3],
             default=[1, 2, 3],
-            format_func=lambda t: {1: "Turno 1 · 22:00–06:00", 2: "Turno 2 · 06:00–14:00", 3: "Turno 3 · 14:00–22:00"}[t],
+            format_func=lambda t: {1: "Turno 1 · 06:00–14:00", 2: "Turno 2 · 14:00–22:00", 3: "Turno 3 · 22:00–06:00"}[t],
             key="resumen_turnos",
         )
     if f_ini > f_fin:
@@ -96,7 +96,7 @@ def render(filtros: dict):
     if not turnos_activos:
         st.info("Sin turnos seleccionados: los KPI y el desempeño mostrarán cero datos; la sección de intensidad conserva sus filtros propios.")
     turnos_activos = filtros.get("turnos", [])
-    nombres_turnos = {1: "Turno 1 (22:00–06:00)", 2: "Turno 2 (06:00–14:00)", 3: "Turno 3 (14:00–22:00)"}
+    nombres_turnos = {1: "Turno 1 (06:00–14:00)", 2: "Turno 2 (14:00–22:00)", 3: "Turno 3 (22:00–06:00)"}
     turnos_texto = " · ".join(nombres_turnos[t] for t in turnos_activos if t in nombres_turnos) or "Sin turnos"
     periodo_texto = f"{filtros['fecha_inicio']:%d %b %Y} – {filtros['fecha_fin']:%d %b %Y}"
     st.markdown(

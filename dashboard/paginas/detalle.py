@@ -249,14 +249,14 @@ def render(filtros: dict):
             )
         with fila_superior[1]:
             datos_t1 = df_plot[df_plot["turno"].astype(str) == "1"]
-            st.plotly_chart(grafica_turno(datos_t1, "T1 · Real vs. esperado (22:00–06:00)"), use_container_width=True, theme=None)
+            st.plotly_chart(grafica_turno(datos_t1, "T1 · Real vs. esperado (06:00–14:00)"), use_container_width=True, theme=None)
         fila_inferior = st.columns(2)
         with fila_inferior[0]:
             datos_t2 = df_plot[df_plot["turno"].astype(str) == "2"]
-            st.plotly_chart(grafica_turno(datos_t2, "T2 · Real vs. esperado (06:00–14:00)"), use_container_width=True, theme=None)
+            st.plotly_chart(grafica_turno(datos_t2, "T2 · Real vs. esperado (14:00–22:00)"), use_container_width=True, theme=None)
         with fila_inferior[1]:
             datos_t3 = df_plot[df_plot["turno"].astype(str) == "3"]
-            st.plotly_chart(grafica_turno(datos_t3, "T3 · Real vs. esperado (14:00–22:00)"), use_container_width=True, theme=None)
+            st.plotly_chart(grafica_turno(datos_t3, "T3 · Real vs. esperado (22:00–06:00)"), use_container_width=True, theme=None)
 
     # Crear figura con 2 ejes Y
     fig_serie = make_subplots(specs=[[{"secondary_y": True}]])
@@ -633,7 +633,7 @@ def render_fa_formacion(df_dm_todo: pd.DataFrame, filtros: dict):
                 x=df_turno["fecha_turno"],
                 y=df_turno["kwh"],
                 mode="lines+markers",
-                name=f"{turno} · { {'T1': '22:00–06:00', 'T2': '06:00–14:00', 'T3': '14:00–22:00'}[turno] }",
+                name=f"{turno} · { {'T1': '06:00–14:00', 'T2': '14:00–22:00', 'T3': '22:00–06:00'}[turno] }",
                 line={"color": colores_turno[turno], "width": 2},
                 marker={"size": 5},
                 connectgaps=False,
