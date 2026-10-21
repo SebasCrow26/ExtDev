@@ -1,13 +1,13 @@
-# Modelos
+# Modelos de consumo esperado
 
-`modelos.pkl` trae los modelos de consumo esperado ya entrenados (uno por proceso y nivel: turno, día y semana; Huber o GradientBoosting, el que mejor resultó en la prueba), con el intervalo de cada uno. Se entrenaron una sola vez con los datos de Clarios y **no se reentrenan**.
+El dashboard reutiliza `modelos.pkl` mediante `modelo_esperado_api.py`. Hay un modelo por proceso y nivel temporal; `predecir()` devuelve el consumo esperado y su intervalo.
 
-`modelo_esperado_api.py` los usa:
+La demo carga las observaciones de `dashboard/datos_simulados/`, pero el artefacto versionado fue entrenado previamente con datos de Clarios. Contiene parámetros ajustados, no las filas originales. Por eso, los resultados combinan entradas sintéticas con un modelo histórico y deben presentarse como demostración, no como validación de desempeño con datos sintéticos.
+
+Ejemplo desde la raíz del repositorio:
 
 ```python
-from modelos.modelo_esperado_api import predecir     # con la raíz del repositorio en el path
-predecir("horno", 65000, planta="RC", nivel="dia", fecha="2026-10-01", produccion_t1=74000, produccion_t2=70000)
-# -> {'kwh_esperado': ..., 'kwh_inferior': ..., 'kwh_superior': ..., 'modelo': ..., ...}
-```
+from modelos.modelo_esperado_api import predecir
 
-Procesos de RC: triturado, horno, refinacion, filtros y ptari. Si no se indican `produccion_t1` y `produccion_t2`, se asume que fueron iguales a `produccion`. El modelo no usa `operando` ni el régimen de operación (se calculan con el mismo consumo que se quiere explicar).
+resultado = predecir("horno", 65000, planta="RC", nivel="dia", fecha="2026-10-01")
+```

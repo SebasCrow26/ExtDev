@@ -1,5 +1,4 @@
-"""Utilidades compartidas: leer config.yaml y cargar tablas (reales si existen, si no de ejemplo)."""
-import os
+"""Utilidades compartidas: leer config.yaml y cargar exclusivamente tablas sintéticas."""
 from pathlib import Path
 
 import pandas as pd
@@ -52,23 +51,18 @@ def supuestos_en_uso(ruta=None):
 
 
 def leer_tabla(nombre, usar_ejemplo=None):
-    """Lee la tabla `nombre` (sin .csv).
-
-    Usa data/clean (dentro de dashboard/) si el archivo existe; si no, datos_simulados.
-    Fuerza los datos de ejemplo con usar_ejemplo=True o con la variable de entorno CLARIOS_USAR_EJEMPLO=1.
-    La fuente usada queda en df.attrs["fuente"].
-    """
+    """Lee exclusivamente tablas sintéticas versionadas en datos_simulados/."""
     cfg = cargar_config()
-    real = RAIZ / cfg["rutas"]["datos_reales"] / f"{nombre}.csv"
     ejemplo = RAIZ / cfg["rutas"]["datos_ejemplo"] / f"{nombre}.csv"
-    if usar_ejemplo is None:
-        usar_ejemplo = os.environ.get("CLARIOS_USAR_EJEMPLO") == "1" or not real.exists()
-    ruta = ejemplo if usar_ejemplo else real
-    df = pd.read_csv(ruta)
+    if usar_ejemplo is False:
+        raise ValueError("Este repositorio solo permite cargar datos sintéticos.")
+    if not ejemplo.exists():
+        raise FileNotFoundError(f"No existe la tabla sintética requerida: {ejemplo}")
+    df = pd.read_csv(ejemplo)
     for col in COLUMNAS_FECHA:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col])
-    df.attrs["fuente"] = "ejemplo" if usar_ejemplo else "real"
+    df.attrs["fuente"] = "sintético"
     return df
 
 

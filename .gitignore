@@ -1,0 +1,14 @@
+# Tablas reales o archivos locales: este repositorio solo publica datos sintéticos.
+/dashboard/data/
+/data/clean/
+**/data/clean/
+
+
+/data/interim/
+
+# Entornos y temporales de Python/Streamlit.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.streamlit/secrets.toml

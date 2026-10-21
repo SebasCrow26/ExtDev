@@ -3,7 +3,7 @@
 Se ejecuta sola:   streamlit run dashboard/pagina_monitoreo.py
 o se integra en el dashboard con `mostrar()`. Cada 5 segundos llegan una o más horas de lecturas del SCADA (inventadas), se limpian
 con las reglas del proyecto, se cierran los turnos y se recalculan el semáforo y las alertas. El motor está en `monitoreo.py`.
-Con dashboard/data/clean (datos reales) la historia de partida es real; si no, se usa la simulada.
+La historia de partida se carga exclusivamente desde `dashboard/datos_simulados/`.
 """
 import sys
 from pathlib import Path
@@ -62,7 +62,7 @@ def _barra_lateral(motor: MotorEnVivo) -> None:
             p["alerta_costo_cop"] = st.number_input("Costo mínimo del episodio (COP)", 0.0, 5_000_000.0, float(p["alerta_costo_cop"]), step=50_000.0)
             p["semaforo_amarillo"] = st.number_input("Semáforo amarillo desde (%)", 0.0, 50.0, float(p["semaforo_amarillo"]))
             p["semaforo_rojo"] = st.number_input("Semáforo rojo desde (%)", 0.0, 100.0, float(p["semaforo_rojo"]))
-            st.caption("Los umbrales son provisionales del equipo, sin respaldo de Clarios. Los turnos (06-14, 14-22, 22-06) son un supuesto.")
+            st.caption("Umbrales y turnos ilustrativos para la demostración sintética.")
 
 
 def _tarjetas(motor: MotorEnVivo) -> None:
@@ -73,7 +73,7 @@ def _tarjetas(motor: MotorEnVivo) -> None:
         with col, st.container(border=True):
             st.markdown(f"<span style='color:{COLORES[s.color]};font-size:1.3em'>●</span> **{p.capitalize()}**", unsafe_allow_html=True)
             st.metric("Exceso neto (últimos 7 días)", f"{s.exceso_pct:+.1f} %" if pd.notna(s.exceso_pct) else "—",
-                      f"{s.costo_cop / 1e6:,.1f} M COP" if s.costo_cop else None, delta_color="inverse", help="Suma del real menos suma del esperado sobre los últimos 21 turnos válidos. Sale del modelo entrenado.")
+                      f"{s.costo_cop / 1e6:,.1f} M COP" if s.costo_cop else None, delta_color="inverse", help="Suma del real menos suma del esperado sobre los últimos 21 turnos válidos. Estimado desde la referencia mediana sintética.")
             frac = min(c.horas / HORAS_TURNO, 1.0)
             st.progress(frac, text=f"Turno {int(c.turno)} en curso: {int(c.horas)}/{HORAS_TURNO} h")
             if c.horas and pd.notna(c.razon):

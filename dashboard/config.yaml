@@ -26,19 +26,19 @@ turnos:
 
 tarifas:
   tarifa_kwh_cop:
-    valor: 542.475
+    valor: 500.0
     unidad: "COP por kWh"
-    tipo: dato_clarios
-    descripcion: "Costo del kWh para convertir energía en pesos."
-    justificacion: "Media simple de la tarifa mensual de Clarios de octubre de 2025 a julio de 2026 (10 meses, rango 523.28 a 568.46; data/clean/tarifa_kwh_mensual.csv)."
-    advertencia: "No está ponderada por consumo y faltan agosto y septiembre de 2026. Solo se debe aplicar a energía del mismo alcance y periodo que la tarifa."
+    tipo: supuesto
+    descripcion: "Tarifa ilustrativa para convertir energia sintetica en costo."
+    justificacion: "Valor ficticio de referencia para la demostracion."
+    advertencia: "No representa una tarifa real ni debe usarse para decisiones economicas."
   gas_cop_m3:
-    valor: 1799.419
+    valor: 1500.0
     unidad: "COP por m3"
-    tipo: dato_clarios
-    descripcion: "Costo del gas para convertir m3 en pesos."
-    justificacion: "Costo de la base de Clarios (hoja RC GAS) de enero a junio de 2026; de octubre a diciembre de 2025 fue 1681.7."
-    advertencia: "El gas del SCADA no es conciliable con la base de Clarios; no usar este costo para el gas total de la planta."
+    tipo: supuesto
+    descripcion: "Tarifa ilustrativa para convertir gas sintetico en costo."
+    justificacion: "Valor ficticio de referencia para la demostracion."
+    advertencia: "No representa una tarifa real ni debe usarse para decisiones economicas."
 
 unidades:
   contador_energia_a_kwh:
@@ -46,8 +46,8 @@ unidades:
     unidad: "kWh por unidad del contador (1/1000, es decir, Wh a kWh)"
     tipo: supuesto
     descripcion: "Factor para convertir el acumulado de los contadores del SCADA a kWh."
-    justificacion: "Evidencia indirecta. En F&A, julio de 2026 da una razón de 0.95 a 0.97 frente a la base de Clarios. Si fuera GW (como informó Gabriel Castro), el consumo mensual sería unas 10^6 veces mayor."
-    advertencia: "La unidad de los contadores no está confirmada por Clarios. Las razones frente a la base en RC (0.49 a 1.24) no la confirman por sí solas."
+    justificacion: "Factor ilustrativo de conversión para las lecturas de la demostración sintética."
+    advertencia: "No valida la unidad de ningún medidor real."
   erp_a_normalizada:
     valor: {UN: unidades, KG: kg, L: litros, M3: m3}
     unidad: "código de unidad del ERP a unidad normalizada"
@@ -289,7 +289,7 @@ mapa_procesos:
   tipo: supuesto
   descripcion: "Mapa de procesos de modelado. Los nombres de líneas salen del mapa de Clarios; la relación con los medidores es una decisión del equipo."
   justificacion: "Cada medidor de proceso se asocia al proceso que lo nombra. Refinación suma dos medidores y tres líneas."
-  advertencia: "La correspondencia exacta entre medidores y líneas no fue confirmada por Clarios. Los medidores de RC cubren entre el 49 % y el 124 % de lo que reporta la base mensual (mediana 62 %), así que no son todo el consumo de la planta."
+  advertencia: "La relación entre medidores y líneas es una configuración de demostración; no describe una planta real."
 
 semaforo:
   verde_hasta_pct:
@@ -368,17 +368,10 @@ modelos:
     advertencia: "La producción supuesta de cada día es el promedio del mismo día de la semana en las últimas 4 semanas por un factor de escenario (0.85, 1.0, 1.15); no es un plan de Clarios."
 
 rutas:
-  datos_reales:
-    valor: data/clean
-    unidad: "ruta relativa a la raíz del repositorio"
-    tipo: tecnico
-    descripcion: "Carpeta de las tablas limpias."
-    justificacion: "Convención del proyecto."
-    advertencia: ""
   datos_ejemplo:
     valor: datos_simulados
-    unidad: "ruta relativa a la raíz del repositorio"
+    unidad: "ruta relativa a dashboard/"
     tipo: tecnico
-    descripcion: "Carpeta de los datos de ejemplo (sintéticos)."
-    justificacion: "Convención del proyecto."
-    advertencia: ""
+    descripcion: "Carpeta unica de datos sinteticos para la demostracion."
+    justificacion: "El lector de tablas solo consulta esta carpeta."
+    advertencia: "No se cargan archivos de datos reales."

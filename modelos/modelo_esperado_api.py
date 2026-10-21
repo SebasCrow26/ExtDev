@@ -12,6 +12,7 @@ Funciones reutilizables:
 from __future__ import annotations
 
 import pickle
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -29,6 +30,7 @@ def ruta_modelos():
     return MODELOS / "modelos.pkl"
 
 
+@lru_cache(maxsize=1)
 def cargar_modelos():
     ruta = ruta_modelos()
     if not ruta.exists():
