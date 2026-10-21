@@ -11,6 +11,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from dashboard.configuracion import texto
 from dashboard.datos import (
     calcular_alertas_exceso_sostenido,
     get_anomalias_candidatas_rc,
@@ -171,13 +172,13 @@ def render(filtros: dict):
             |---|---|---|---|
             | **1** | **Exceso sostenido** | Rachas de turnos consecutivos con exceso &gt; **{pct_umbral:.0f} %** del esperado, duración &ge; **{min_turnos} turnos** y costo acumulado &ge; **${min_costo:,.0f} COP**. Excluye modelos con confianza baja. | `resultados_modelo` |
             | **2** | **Anomalía puntual** | Marcadas con `es_anomalia = 1` por ensamble de Isolation Forest y MAD robusto. | `resultados_modelo` |
-            | **3a** | **Consumo en turno apagado** | Filas sintéticas de `anomalias_candidatas_rc` con `z_robusto > 0`. | `anomalias_candidatas_rc` |
+            | **3a** | **Consumo en turno apagado** | Filas de `anomalias_candidatas_rc` con `z_robusto > 0`. | `anomalias_candidatas_rc` |
             | **3b** | **Parada inesperada** | Filas con `z_robusto < 0` (consumo casi cero donde típicamente opera alto, ej. filtros en festivos). | `anomalias_candidatas_rc` |
             | **4** | **Dato incompleto** | Turnos con `calidad_ok = 0` (cobertura &lt; 75 %). Aviso informativo de calidad, no de sobreconsumo. | `dataset_modelo` |
             | **Clasificación** | **Firmes / indicativas** | Ambas pestañas pueden incluir exceso sostenido, anomalías puntuales, consumo en turno apagado y paradas inesperadas. Se clasifican por confianza del modelo: alta o media = firme; baja = indicativa. | `resultados_modelo` y `anomalias_candidatas_rc` |
             | **Conteo de calidad** | **Avisos consolidados** | Se agrupan los registros incompletos por fecha y turno. Un aviso puede incluir varios procesos; el KPI cuenta turnos afectados, no registros proceso-turno. | `dataset_modelo` |
 
-            *¿Por qué esta regla para exceso sostenido?* Los umbrales son parámetros ilustrativos editables; las alertas resultantes describen únicamente los datos sintéticos de esta demo.
+            *¿Por qué esta regla para exceso sostenido?* {texto('Los umbrales son parámetros editables, provisionales del equipo y sin respaldo de Clarios.', 'Los umbrales son parámetros ilustrativos editables; las alertas resultantes describen únicamente los datos sintéticos de esta demo.')}
             """
         )
 
@@ -196,8 +197,8 @@ def render(filtros: dict):
 
     with tab_indicativas:
         render_callout(
-            "> [!WARNING]\n"
-              "> **Demo sintética:** Las alertas ilustran reglas de detección sobre datos ficticios. No describen eventos de una planta real."
+            "> [!WARNING]\n" +
+              texto("> **Indicativas:** son alertas de procesos cuyo modelo tiene confianza baja. Sirven de referencia, pero no conviene decidir solo con ellas.", "> **Demo sintética:** Las alertas ilustran reglas de detección sobre datos ficticios. No describen eventos de una planta real.")
         )
         if df_indicativas.empty:
             st.info("No hay eventos indicativos registrados en el periodo.")

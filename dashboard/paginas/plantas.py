@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
+from dashboard.configuracion import texto
 from dashboard.datos import (
     get_base_mensual_plantas,
     get_metas_clarios,
@@ -228,7 +229,7 @@ def render(filtros: dict):
         unsafe_allow_html=True,
     )
 
-    st.markdown("### Desempeño vs. meta sintética")
+    st.markdown(texto("### Desempeño vs. presupuesto", "### Desempeño vs. meta sintética"))
     st.caption(f"Comparación mensual de {_texto_mes(mes_inicio)} a {_texto_mes(mes_fin)} · Consumo y producción equivalente")
     if planta_sel == "Todas las plantas":
         st.markdown("#### Tendencia mensual · todas las plantas")
@@ -242,12 +243,12 @@ def render(filtros: dict):
         )
         if planta_sel == "Todas las plantas":
             st.markdown(
-                """
+                f"""
                 <div class="plant-budget-card">
                     <small>Alcance seleccionado</small>
                     <strong>Todas las plantas</strong>
                     <p>El indicador consolidado es el consumo total dividido por la producción equivalente total.</p>
-                    <p>No se aplica una meta única: los metas sintéticas son específicos para cada planta.</p>
+                    <p>No se aplica una meta única: {texto('el presupuesto es específico', 'los metas sintéticas son específicos')} para cada planta.</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -289,9 +290,9 @@ def render(filtros: dict):
                 <div class="plant-budget-card">
                     <small>Planta seleccionada</small>
                     <strong>{planta_sel}</strong>
-                    <hr><small>Meta sintética</small>
+                    <hr><small>{texto('Presupuesto de Clarios', 'Meta sintética')}</small>
                     {presupuesto_html}
-                    <p>Meta ilustrativa del periodo para el periodo seleccionado.</p>
+                    <p>{texto('Presupuesto de kWh por equivalente del periodo seleccionado.', 'Meta ilustrativa del periodo para el periodo seleccionado.')}</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -354,7 +355,7 @@ def render(filtros: dict):
                 secondary_y=False,
             )
             fig_hist = configurar_grafico(
-                fig_hist, f"Desempeño vs. meta sintética · {planta_sel}", altura=390
+                fig_hist, f"{texto('Desempeño vs. presupuesto', 'Desempeño vs. meta sintética')} · {planta_sel}", altura=390
             )
             fig_hist.update_yaxes(title_text="Consumo eléctrico (kWh)", secondary_y=False)
             fig_hist.update_yaxes(title_text="Producción equivalente", secondary_y=True, showgrid=False)

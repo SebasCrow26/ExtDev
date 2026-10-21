@@ -57,6 +57,11 @@ def carpeta_datos_reales():
     return Path(ruta) if ruta else None
 
 
+def texto(real, sintetico):
+    """Texto según la fuente activa: `real` si se cargaron las tablas reales (CLARIOS_DATOS_REALES), `sintetico` si no."""
+    return real if carpeta_datos_reales() is not None else sintetico
+
+
 def leer_tabla(nombre, usar_ejemplo=None):
     """Lee la tabla `nombre`. Por defecto usa las tablas sintéticas de datos_simulados/.
 

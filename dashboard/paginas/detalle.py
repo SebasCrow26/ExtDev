@@ -14,6 +14,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import streamlit as st
 
+from dashboard.configuracion import texto
 from dashboard.datos import (
     calcular_costo_kwh,
     get_anomalias_candidatas_rc,
@@ -546,8 +547,8 @@ def render_fa_formacion(df_dm_todo: pd.DataFrame, filtros: dict):
     """
     st.info(
         "**Planta F&A — Proceso de Formación:** F&A no cuenta con modelo de consumo esperado en `resultados_modelo` "
-        "(la serie es ilustrativa y su comportamiento depende de los datos sintéticos incluidos). "
-        "Se presenta el consumo real, unidades producidas y el patrón de turnos activos. **No se calculan excesos para F&A.**"
+        + texto("(se muestra su consumo medido). ", "(la serie es ilustrativa y su comportamiento depende de los datos sintéticos incluidos). ")
+        + "Se presenta el consumo real, unidades producidas y el patrón de turnos activos. **No se calculan excesos para F&A.**"
     )
 
     orden_turno = orden_turnos_cronologico()
@@ -600,7 +601,7 @@ def render_fa_formacion(df_dm_todo: pd.DataFrame, filtros: dict):
             <div class="kpi-card">
                 <div class="kpi-title"><span>Intensidad Real</span></div>
                 <div class="kpi-value">{intensidad_fa:.2f} <span style="font-size:1rem;color:#94a3b8">kWh/u</span></div>
-                <div class="kpi-sub">Indicador de la serie sintética</div>
+                <div class="kpi-sub">{texto('Consumo por unidad producida', 'Indicador de la serie sintética')}</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -646,4 +647,4 @@ def render_fa_formacion(df_dm_todo: pd.DataFrame, filtros: dict):
 
     # Patrón encendido / apagado
     st.markdown("#### Patrón de Encendido / Apagado Semanal")
-    render_callout("Los gráficos de F&A usan exclusivamente datos sintéticos y muestran patrones de demostración. No son un calendario ni una medición operativa real.")
+    render_callout(texto("El patrón muestra los turnos con consumo encendido; no es el calendario de turnos de Clarios.", "Los gráficos de F&A usan exclusivamente datos sintéticos y muestran patrones de demostración. No son un calendario ni una medición operativa real."))

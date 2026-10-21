@@ -11,6 +11,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from dashboard.configuracion import texto
 from dashboard.datos import (
     get_calidad_energia_fa,
     get_calidad_energia_rc,
@@ -41,7 +42,7 @@ def render(filtros: dict):
     # ==========================================================================
     # 1. INDICADORES DE CALIDAD SINTÉTICA
     # ==========================================================================
-    st.markdown("### Indicadores de integridad de telemetría sintética")
+    st.markdown(texto("### Indicadores de integridad de telemetría", "### Indicadores de integridad de telemetría sintética"))
 
     # 7 medidores de proceso en RC
     med_proc = ["TRITURADO", "HORNO", "REFINO_1", "REFINO_2", "FILTRO_1", "FILTRO_2", "PTARI"]
@@ -100,10 +101,10 @@ def render(filtros: dict):
             f"""
             <div class="kpi-card">
                 <div class="kpi-title">
-                    <span>Referencia sintética</span>
+                    <span>{texto('Razón con la base mensual', 'Referencia sintética')}</span>
                 </div>
-                <div class="kpi-value" style="color:#212492">{ratio_mediana:.2f} <span style="font-size:1rem">mediana sintética</span></div>
-                <div class="kpi-sub">Razón del conjunto de demostración</div>
+                <div class="kpi-value" style="color:#212492">{ratio_mediana:.2f} <span style="font-size:1rem">{texto('mediana', 'mediana sintética')}</span></div>
+                <div class="kpi-sub">Razón SCADA (7 medidores) / base mensual</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -114,16 +115,24 @@ def render(filtros: dict):
     # ==========================================================================
     # 2. COMPARACIÓN DE SERIES SINTÉTICAS
     # ==========================================================================
-    st.markdown("### Comparación mensual de series sintéticas")
+    st.markdown(texto("### Comparación mensual de series", "### Comparación mensual de series sintéticas"))
     render_callout(
-        """
+        texto(
+            """
+        > [!IMPORTANT]
+        > **¿Cómo interpretar esta comparación?**
+        > La serie de medidores agrega los procesos seleccionados; no equivale a la energía total de la planta.
+        > No sabemos qué abarca la base mensual de Clarios, así que la razón no es una cobertura ni una conciliación.
+        """,
+            """
         > [!IMPORTANT]
         > **¿Cómo interpretar esta comparación?**
         > Ambas series son sintéticas y se incluyen para ilustrar una comparación. La serie de medidores
         > agrega procesos seleccionados; no equivale a la energía total de una instalación,
         > y las diferencias no representan una conciliación real,
         > por lo que no se deben extrapolar a una operación real.
-        """
+        """,
+        )
     )
 
     if not df_val_rc.empty:
@@ -136,7 +145,7 @@ def render(filtros: dict):
         fig_val.add_trace(go.Bar(
             x=df_v_plot["mes_str"],
             y=df_v_plot["kwh_base_clarios"] / 1000.0,
-            name="Base esta demostración (MWh)",
+            name="Base mensual (MWh)",
             marker_color="rgba(148, 163, 184, 0.4)",
             marker_line_color="#64748b",
             marker_line_width=1
@@ -149,7 +158,7 @@ def render(filtros: dict):
             marker_color="#212492"
         ))
 
-        fig_val = configurar_grafico(fig_val, "Energía Mensual: Base esta demostración vs SCADA 7 Medidores (MWh)", altura=340)
+        fig_val = configurar_grafico(fig_val, "Energía Mensual: Base mensual vs SCADA 7 Medidores (MWh)", altura=340)
         fig_val.update_yaxes(title_text="Energía (MWh)")
         fig_val.update_layout(barmode="group")
         st.plotly_chart(fig_val, use_container_width=True, theme=None)
@@ -160,12 +169,12 @@ def render(filtros: dict):
             x=df_v_plot["mes_str"],
             y=df_v_plot["ratio_scada_vs_base"],
             mode="lines+markers",
-            name="Razón SCADA / Base esta demostración",
+            name="Razón SCADA / Base mensual",
             line={"color": "#f59e0b", "width": 2.5},
             marker={"size": 6}
         ))
-        fig_ratio.add_hline(y=ratio_mediana, line_dash="dash", line_color="#10b981", annotation_text=f"Mediana sintética: {ratio_mediana:.2f}")
-        fig_ratio = configurar_grafico(fig_ratio, "Evolución de la Razón Mensual (SCADA / Base esta demostración)", altura=300)
+        fig_ratio.add_hline(y=ratio_mediana, line_dash="dash", line_color="#10b981", annotation_text=f"{texto('Mediana', 'Mediana sintética')}: {ratio_mediana:.2f}")
+        fig_ratio = configurar_grafico(fig_ratio, "Evolución de la Razón Mensual (SCADA / Base mensual)", altura=300)
         fig_ratio.update_yaxes(title_text="Razón (fracción)")
         st.plotly_chart(fig_ratio, use_container_width=True, theme=None)
 
@@ -188,10 +197,10 @@ def render(filtros: dict):
             hide_index=True,
             use_container_width=True
         )
-        st.caption("Los valores corresponden exclusivamente a datos sintéticos incluidos para la demostración.")
+        st.caption(texto("Calidad por medidor calculada sobre los datos cargados.", "Los valores corresponden exclusivamente a datos sintéticos incluidos para la demostración."))
 
     with col_t2:
-        st.markdown("#### Congelamientos detectados en la serie sintética")
+        st.markdown(texto("#### Congelamientos detectados en la serie", "#### Congelamientos detectados en la serie sintética"))
         df_cong_show = df_cong_rc.copy()
         df_cong_show["Inicio"] = df_cong_show["inicio"].dt.strftime("%Y-%m-%d %H:%M")
         df_cong_show["Fin"] = df_cong_show["fin"].dt.strftime("%Y-%m-%d %H:%M")
@@ -212,7 +221,7 @@ def render(filtros: dict):
     # ==========================================================================
     st.markdown("### Los 10 Supuestos en Uso (Catálogo `config.yaml`)")
     st.markdown(
-        "Toda decisión analítica que no contó con validación textual de esta demostración fue parametrizada formalmente "
+        "Toda decisión analítica que no contó con validación textual de Clarios fue parametrizada formalmente "
         "con su justificación técnica y advertencia obligatoria."
     )
 
@@ -244,5 +253,5 @@ def render(filtros: dict):
     # 5. RESUMEN DE LIMITACIONES (DOCS/04)
     # ==========================================================================
     st.markdown("###  Resumen de Limitaciones del Proyecto (`docs/04`)")
-    st.markdown("Los indicadores, periodos y limitaciones que aparecen en esta página se calculan sobre el conjunto sintético de demostración. No deben interpretarse como auditoría de telemetría real.")
+    st.markdown(texto("Los indicadores, periodos y limitaciones de esta página se calculan sobre los datos cargados. No certifican lo que el contrato de datos no cubre.", "Los indicadores, periodos y limitaciones que aparecen en esta página se calculan sobre el conjunto sintético de demostración. No deben interpretarse como auditoría de telemetría real."))
 

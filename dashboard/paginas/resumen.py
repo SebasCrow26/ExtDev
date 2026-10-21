@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from dashboard.configuracion import texto
 from dashboard.datos import (
     calcular_alertas_exceso_sostenido,
     calcular_costo_kwh,
@@ -317,11 +318,11 @@ def render(filtros: dict):
     # ==========================================================================
     st.markdown("### Intensidad Energética vs Meta Histórica (p25)")
     render_callout(
-        """
+        f"""
         > [!NOTE]
         > **Cálculo exacto:** kWh total dividido entre producción total del periodo (no promedio de cocientes).
         > En RC se expresa en **kWh por tonelada** (×1,000). Por la producción por lotes, la agregación semanal es la más representativa.
-        > Las metas p25 se cargan de la tabla sintética `metas.csv` y son referencias ilustrativas de esta demo.
+        > {texto('Las metas p25 se calculan del histórico (percentil 25 del kWh por unidad); no son metas de Clarios.', 'Las metas p25 se cargan de la tabla sintética `metas.csv` y son referencias ilustrativas de esta demo.')}
         """
     )
 
