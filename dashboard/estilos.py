@@ -896,9 +896,11 @@ def render_header(titulo: str, subtitulo: str = ""):
 
 
 def render_alcance_rc_banner():
-    """Aclara que esta interfaz usa exclusivamente datos sintéticos."""
-    st.markdown(
-        '<div class="alcance-disclaimer"><strong>DEMO SINTÉTICA:</strong> Las cifras, fechas, metas y alertas son ilustrativas; no representan mediciones ni resultados operativos reales.</div>',
-        unsafe_allow_html=True
-    )
+    """Aclara si la interfaz usa datos sintéticos (por defecto) o las tablas reales cargadas en local."""
+    from dashboard.configuracion import carpeta_datos_reales
+    if carpeta_datos_reales() is not None:
+        texto = '<strong>DATOS REALES DE CLARIOS (uso local):</strong> no compartir ni desplegar esta ventana.'
+    else:
+        texto = '<strong>DEMO SINTÉTICA:</strong> Las cifras, fechas, metas y alertas son ilustrativas; no representan mediciones ni resultados operativos reales.'
+    st.markdown(f'<div class="alcance-disclaimer">{texto}</div>', unsafe_allow_html=True)
 

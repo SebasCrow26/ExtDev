@@ -1,4 +1,5 @@
 """Utilidades compartidas: leer config.yaml y cargar exclusivamente tablas sintéticas."""
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -50,19 +51,33 @@ def supuestos_en_uso(ruta=None):
     return [p for p in catalogo(ruta) if p["tipo"] == "supuesto"]
 
 
+def carpeta_datos_reales():
+    """Carpeta local con las tablas reales, solo si se definió la variable de entorno CLARIOS_DATOS_REALES (uso local; nunca en un despliegue público)."""
+    ruta = os.environ.get("CLARIOS_DATOS_REALES")
+    return Path(ruta) if ruta else None
+
+
 def leer_tabla(nombre, usar_ejemplo=None):
-    """Lee exclusivamente tablas sintéticas versionadas en datos_simulados/."""
-    cfg = cargar_config()
-    ejemplo = RAIZ / cfg["rutas"]["datos_ejemplo"] / f"{nombre}.csv"
-    if usar_ejemplo is False:
-        raise ValueError("Este repositorio solo permite cargar datos sintéticos.")
-    if not ejemplo.exists():
-        raise FileNotFoundError(f"No existe la tabla sintética requerida: {ejemplo}")
-    df = pd.read_csv(ejemplo)
+    """Lee la tabla `nombre`. Por defecto usa las tablas sintéticas de datos_simulados/.
+
+    Si la variable de entorno CLARIOS_DATOS_REALES apunta a una carpeta con las tablas reales, lee de ahí (solo en local).
+    El despliegue público no define esa variable, así que ahí siempre se leen las sintéticas.
+    """
+    real = carpeta_datos_reales()
+    if real is not None and usar_ejemplo is not True:
+        ruta, fuente = real / f"{nombre}.csv", "real"
+    else:
+        cfg = cargar_config()
+        ruta, fuente = RAIZ / cfg["rutas"]["datos_ejemplo"] / f"{nombre}.csv", "sintético"
+    if usar_ejemplo is False and real is None:
+        raise ValueError("Sin CLARIOS_DATOS_REALES solo se pueden cargar datos sintéticos.")
+    if not ruta.exists():
+        raise FileNotFoundError(f"No existe la tabla requerida: {ruta}")
+    df = pd.read_csv(ruta)
     for col in COLUMNAS_FECHA:
         if col in df.columns:
             df[col] = pd.to_datetime(df[col])
-    df.attrs["fuente"] = "sintético"
+    df.attrs["fuente"] = fuente
     return df
 
 

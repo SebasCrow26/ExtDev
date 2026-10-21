@@ -225,7 +225,7 @@ def resolver_tarifa(
     match = tarifas_df[tarifas_df["mes"] == mes_ts]
     if not match.empty:
         tarifa = float(match["costo_kwh_cop"].iloc[0])
-        return tarifa, False, f"Tarifa sintética ({fecha.strftime('%b %Y')}): {tarifa:,.2f} COP/kWh"
+        return tarifa, False, f"Tarifa ({fecha.strftime('%b %Y')}): {tarifa:,.2f} COP/kWh"
 
     # Fallback: última disponible
     ult_fila = tarifas_df.iloc[-1]
@@ -234,7 +234,7 @@ def resolver_tarifa(
     return (
         tarifa,
         True,
-        f"Tarifa última disponible ({ult_mes}): {tarifa:,.2f} COP/kWh (mes {fecha.strftime('%b %Y')} sin tarifa en base sintética)"
+        f"Tarifa última disponible ({ult_mes}): {tarifa:,.2f} COP/kWh (mes {fecha.strftime('%b %Y')} sin tarifa en la base de tarifas)"
     )
 
 
