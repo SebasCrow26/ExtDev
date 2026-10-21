@@ -8,7 +8,7 @@ Formato de archivo: CSV UTF-8, separador coma, decimal con punto, fechas ISO, si
 
 ## Convenciones
 
-- **Turnos (provisionales, por confirmar con Clarios):** turno 1 = 06:00 a 14:00, turno 2 = 14:00 a 22:00, turno 3 = 22:00 a 06:00. `fecha_turno` es la fecha en que **inicia** el turno (una transacción a las 03:00 del día 10 pertenece al turno 3 del día 9).
+- **Turnos:** turno 1 = 22:00 a 06:00, turno 2 = 06:00 a 14:00, turno 3 = 14:00 a 22:00. `fecha_turno` es la fecha en que **inicia** el turno.
 - **Unidades:** energía en **kWh**, gas en **m³**.
 - **Moneda:** pesos colombianos (COP).
 - **Hora local** de la planta. No hay cambio de horario de verano en Colombia.
