@@ -1,4 +1,7 @@
-"""API pública del frente de Modelos para el dashboard (Joshua).
+"""API pública de los modelos para el dashboard.
+
+    from modelos.modelo_esperado_api import predecir      # con la raíz del repositorio en sys.path
+
 
 Funciones reutilizables:
 - `predecir(proceso, produccion, planta="RC", nivel="dia", **ctx)` -> dict con kwh esperado,
@@ -14,13 +17,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-RAIZ = Path(__file__).resolve().parents[2]
-INTERIM = RAIZ / "data" / "interim"
-MODELOS = RAIZ / "modelos"
+MODELOS = Path(__file__).resolve().parent   # carpeta modelos/
+INTERIM = MODELOS
 
 
 def ruta_modelos():
-    """Los modelos entregados están en modelos/modelos.pkl; si se reentrenan en local, quedan en data/interim."""
+    """Los modelos entregados están en modelos/modelos.pkl."""
     for carpeta in (MODELOS, INTERIM):
         if (carpeta / "modelos.pkl").exists():
             return carpeta / "modelos.pkl"
@@ -32,7 +34,7 @@ def cargar_modelos():
     if not ruta.exists():
         raise FileNotFoundError(
             f"No existe {ruta}. Los modelos entrenados se entregan en modelos/modelos.pkl: "
-            "copia ese archivo a la carpeta modelos/ del repositorio.")
+            "el archivo tiene que estar en la carpeta modelos/.")
     with open(ruta, "rb") as f:
         return pickle.load(f)
 

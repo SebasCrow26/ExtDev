@@ -1,16 +1,11 @@
 # Datos reales de Clarios: se cargan solo en local, nunca se suben
-data/raw/
-data/clean/
-data/interim/
+dashboard/data/
 *.xlsx
 *.xls
 *.xlsm
-# Entorno y temporales
 __pycache__/
 *.pyc
 .venv/
-venv/
-.ipynb_checkpoints/
 .env
 .streamlit/secrets.toml
 .DS_Store

@@ -4,11 +4,11 @@ Este documento dice qué supone el sistema y qué no puede afirmar. Aplica a los
 
 ## Supuestos
 
-- **Los contadores del SCADA están en Wh**, así que kWh = valor / 1000. Clarios no lo confirmó; el parámetro está en `config/config.yaml` (`unidades.contador_energia_a_kwh`).
+- **Los contadores del SCADA están en Wh**, así que kWh = valor / 1000. Clarios no lo confirmó; el parámetro está en `dashboard/config.yaml` (`unidades.contador_energia_a_kwh`).
 - **Los turnos son 06:00–14:00, 14:00–22:00 y 22:00–06:00**, y la fecha del turno es la de su inicio. Clarios no entregó el calendario de turnos ni el de paradas, así que toda cifra por turno depende de este supuesto.
 - **La hora del ERP es la hora del reporte**, no la de la producción.
 - **Filtros y PTARI no tienen línea propia en el ERP.** Se asocian a la producción de refinación, que por eso aparece repetida en tres procesos: no se debe sumar producción entre procesos.
-- **Tarifa del kWh y del gas**: son valores de referencia en `config/config.yaml`. El ahorro que sale de `fraccion_evitable` (0.5) es un escenario, no un ahorro demostrado.
+- **Tarifa del kWh y del gas**: son valores de referencia en `dashboard/config.yaml`. El ahorro que sale de `fraccion_evitable` (0.5) es un escenario, no un ahorro demostrado.
 - **Plan de producción y presupuesto FY27**: no existen; el año fiscal va de octubre a septiembre. Nada de esto se inventa.
 
 ## Calidad de la medición
@@ -29,9 +29,9 @@ Este documento dice qué supone el sistema y qué no puede afirmar. Aplica a los
 
 ## Datos simulados
 
-- Las 29 tablas de `datos_simulados/` las genera `tools/simular_datos.py` con una semilla fija: son inventadas, tienen el mismo esquema que las reales y nada de lo que se ve en el dashboard corresponde a Clarios.
+- Las 29 tablas de `dashboard/datos_simulados/` las genera un script del repositorio de trabajo con una semilla fija: son inventadas, tienen el mismo esquema que las reales y nada de lo que se ve en el dashboard corresponde a Clarios.
 - El consumo simulado sale de los modelos entregados más ruido, episodios de exceso sostenido, pocas anomalías puntuales y paradas inesperadas, para que el dashboard tenga algo que mostrar. Esas anomalías están puestas a propósito.
-- Para ver datos reales, se copian las tablas a `data/clean/` en local. Esa carpeta está en `.gitignore` y no se sube.
+- Para ver datos reales, se copian las tablas a `dashboard/data/clean/` en local. Esa carpeta está en `.gitignore` y no se sube.
 
 ## Pendiente de confirmar con Clarios
 

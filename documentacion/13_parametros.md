@@ -1,6 +1,6 @@
 # Parámetros del proyecto
 
-**Generado automáticamente desde `config/config.yaml` con `python tools/generar_diccionario.py`. No se edita a mano: se cambia el valor en `config/config.yaml`.**
+**Generado automáticamente desde `dashboard/config.yaml`. No se edita a mano: se cambia el valor en `dashboard/config.yaml`.**
 
 Tipos de parámetro: **dato de Clarios** (viene de Clarios), **SUPUESTO** (decisión sin confirmación de Clarios; trae una advertencia de lo que no se puede concluir), **metodológico** (decisión técnica de análisis) y **técnico** (ruta o formato).
 
@@ -69,7 +69,7 @@ Los **supuestos** son lo primero que hay que revisar si Clarios aporta informaci
 | parámetro | valor | unidad | tipo | descripción | justificación | advertencia |
 |---|---|---|---|---|---|---|
 | `produccion.dias_desfase_fecha_efectiva` | `2` | días | metodológico | Una transacción registrada con esta diferencia o más respecto de su fecha efectiva se asigna a la fecha efectiva. | El 83 % de las diferencias es de un día y corresponde a transacciones de la noche (el ERP les pone el día siguiente); los registros tardíos reales son de 2 días o más. |  |
-| `produccion.prefijos_planta` | ver `config/config.yaml` | prefijo del código de línea a planta | metodológico | Planta de las líneas que no están en el mapa de líneas de Clarios. | Replica la convención de nombres de los códigos de línea del ERP. El mapa de Clarios tiene prioridad. |  |
+| `produccion.prefijos_planta` | ver `dashboard/config.yaml` | prefijo del código de línea a planta | metodológico | Planta de las líneas que no están en el mapa de líneas de Clarios. | Replica la convención de nombres de los códigos de línea del ERP. El mapa de Clarios tiene prioridad. |  |
 
 ## gas
 
@@ -106,7 +106,7 @@ Los **supuestos** son lo primero que hay que revisar si Clarios aporta informaci
 
 | parámetro | valor | unidad | tipo | descripción | justificación | advertencia |
 |---|---|---|---|---|---|---|
-| `mapa_procesos` | ver `config/config.yaml` | relación entre proceso, medidores del SCADA y líneas del ERP | SUPUESTO | Mapa de procesos de modelado. Los nombres de líneas salen del mapa de Clarios; la relación con los medidores es una decisión del equipo. | Cada medidor de proceso se asocia al proceso que lo nombra. Refinación suma dos medidores y tres líneas. | La correspondencia exacta entre medidores y líneas no fue confirmada por Clarios. Los medidores de RC cubren entre el 49 % y el 124 % de lo que reporta la base mensual (mediana 62 %), así que no son todo el consumo de la planta. |
+| `mapa_procesos` | ver `dashboard/config.yaml` | relación entre proceso, medidores del SCADA y líneas del ERP | SUPUESTO | Mapa de procesos de modelado. Los nombres de líneas salen del mapa de Clarios; la relación con los medidores es una decisión del equipo. | Cada medidor de proceso se asocia al proceso que lo nombra. Refinación suma dos medidores y tres líneas. | La correspondencia exacta entre medidores y líneas no fue confirmada por Clarios. Los medidores de RC cubren entre el 49 % y el 124 % de lo que reporta la base mensual (mediana 62 %), así que no son todo el consumo de la planta. |
 
 ## semaforo
 

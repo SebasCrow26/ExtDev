@@ -1,40 +1,33 @@
 # Entregables Clarios – Catch Consulting
 
-Repositorio con lo que se entrega a Clarios: **dashboard, presentación, documentación y modelos**. Los datos de este repositorio son **simulados**. Los datos reales de Clarios no se suben a Git.
+Dashboard, presentación, documentación y modelos del reto de consumo de energía de Clarios.
 
-## Qué hay
-
-| Carpeta | Contenido |
+| Carpeta | Qué hay |
 |---|---|
-| `dashboard/` | Dashboard (Streamlit). Lee las tablas con `src/comun/config.py::leer_tabla`. |
-| `modelos/` | `modelos.pkl`: modelos de consumo esperado ya entrenados (no se reentrenan). |
+| `dashboard/` | Dashboard en Streamlit con la página de **monitoreo en vivo**, sus tablas de datos simulados (`datos_simulados/`) y su configuración (`config.yaml`). |
+| `modelos/` | Modelos de consumo esperado ya entrenados (`modelos.pkl`) y la función `predecir`. |
 | `documentacion/` | Contrato de datos, diccionario, parámetros, glosario, supuestos y limitaciones. |
 | `presentacion/` | Material de la presentación. |
-| `datos_simulados/` | 29 tablas inventadas con el mismo esquema que las reales. |
-| `src/`, `config/`, `tools/`, `tests/` | Código, parámetros, herramientas y pruebas. |
 
-## Datos reales y datos simulados
-
-`leer_tabla` usa `data/clean/` si existe (datos reales cargados en local, ignorada por Git) y si no, `datos_simulados/`. Para forzar los simulados: variable de entorno `CLARIOS_USAR_EJEMPLO=1`.
-
-Los simulados se regeneran con la misma lógica de limpieza del proyecto y una semilla fija:
+## Cómo correr el dashboard
 
 ```bash
-python tools/simular_datos.py --salida ruta/de/salida
+pip install -r dashboard/requirements.txt
+streamlit run dashboard/pagina_monitoreo.py
 ```
 
-## Comprobaciones
+Con **Iniciar**, cada 5 segundos llegan las lecturas de una o más horas del SCADA (inventadas). Se limpian con las reglas del proyecto (reinicios de contador y congelamientos), se cierra cada turno, se compara con el consumo esperado del modelo y se actualizan el semáforo y las alertas. Se pueden inyectar eventos (exceso sostenido, parada, congelamiento, reinicio) o usar el guion de la demostración.
 
-```bash
-python tools/validar_contrato.py --sin-raw          # valida las tablas contra el contrato
-python -m unittest discover -s tests                # 75 pruebas
-python tools/verificar_sin_datos_reales.py          # ningún archivo del repo es copia de los datos reales
-```
+## Datos
+
+Las tablas de `dashboard/datos_simulados/` son **simuladas**: tienen el mismo esquema que las de Clarios, pero son inventadas. Los datos reales no están en este repositorio. Para verlos en local se copian las tablas a `dashboard/data/clean/` (carpeta ignorada por Git) y el dashboard las usa en lugar de las simuladas.
+
+Los modelos se entrenaron una sola vez con los datos de Clarios y no se reentrenan.
 
 ## Uso de IA
 
-Parte del código, de las pruebas y de los documentos se desarrolló con ayuda de Claude (Anthropic). Todo se revisó y se probó por el equipo.
+Parte del código y de los documentos se desarrolló con ayuda de Claude (Anthropic). El equipo lo revisó y lo probó.
 
 ## Pendiente de confirmar con Clarios
 
-Que los modelos entrenados con los datos reales puedan entregarse, y las unidades de los contadores y el calendario de turnos (ver `documentacion/04_supuestos_y_limitaciones.md`).
+Las unidades de los contadores y el calendario de turnos (ver `documentacion/04_supuestos_y_limitaciones.md`).

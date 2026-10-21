@@ -5,8 +5,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-RAIZ = Path(__file__).resolve().parents[2]
-RUTA_CONFIG = RAIZ / "config" / "config.yaml"
+RAIZ = Path(__file__).resolve().parent   # carpeta dashboard/
+RUTA_CONFIG = RAIZ / "config.yaml"
 COLUMNAS_FECHA = ["fecha_turno", "fecha", "hora_inicio", "vigente_desde"]
 CAMPOS_META = ("unidad", "tipo", "descripcion", "justificacion", "advertencia")
 
@@ -54,7 +54,7 @@ def supuestos_en_uso(ruta=None):
 def leer_tabla(nombre, usar_ejemplo=None):
     """Lee la tabla `nombre` (sin .csv).
 
-    Usa data/clean si el archivo existe; si no, data/ejemplo.
+    Usa data/clean (dentro de dashboard/) si el archivo existe; si no, datos_simulados.
     Fuerza los datos de ejemplo con usar_ejemplo=True o con la variable de entorno CLARIOS_USAR_EJEMPLO=1.
     La fuente usada queda en df.attrs["fuente"].
     """
@@ -88,7 +88,7 @@ def lineas_a_proceso(cfg=None):
 
 
 def tabla_mapa_procesos(cfg=None):
-    """DataFrame del mapa de procesos con el formato de data/clean/mapa_procesos.csv (listas unidas con punto y coma)."""
+    """DataFrame del mapa de procesos con el formato de data/clean (dentro de dashboard/)/mapa_procesos.csv (listas unidas con punto y coma)."""
     filas = [[p["planta"], p["proceso_modelo"], ";".join(p["medidores_scada"]), ";".join(p["lineas_erp"]), p["unidad_produccion"], p["nota"]]
              for p in mapa_procesos(cfg)]
     return pd.DataFrame(filas, columns=["planta", "proceso_modelo", "medidores_scada", "lineas_erp", "unidad_produccion", "nota"])

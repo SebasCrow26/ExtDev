@@ -1,8 +1,8 @@
 # Contrato de datos
 
-**El contrato legible por máquina es `config/contrato_datos.yaml`** (tipos, unidades, claves, rangos, continuidad, procedencia y consumidores de cada tabla). De él se genera `documentacion/12_diccionario_datos.md` (`python tools/generar_diccionario.py`, que también genera `documentacion/13_parametros.md` desde `config/config.yaml`) y lo usa el validador (`python tools/validar_contrato.py`, con pruebas en `tests/`). Este documento es la guía narrativa.
+**El contrato legible por máquina es `contrato_datos.yaml` (repositorio de trabajo)** (tipos, unidades, claves, rangos, continuidad, procedencia y consumidores de cada tabla). De él se genera `documentacion/12_diccionario_datos.md` (`python tools/generar_diccionario.py`, que también genera `documentacion/13_parametros.md` desde `dashboard/config.yaml`) y lo usa el validador (`python tools/validar_contrato.py`, con pruebas en `tests/`). Este documento es la guía narrativa.
 
-Este documento fija el formato de todas las tablas. "Datos" las produce en `data/clean/`. "Modelos" y "Dashboard" las consumen. Los ejemplos sintéticos en `data/ejemplo/` ya cumplen este formato.
+Este documento fija el formato de todas las tablas. "Datos" las produce en `dashboard/data/clean/`. "Modelos" y "Dashboard" las consumen. Los ejemplos sintéticos en `data/ejemplo/` ya cumplen este formato.
 
 Formato de archivo: CSV UTF-8, separador coma, decimal con punto, fechas ISO, sin índice.
 

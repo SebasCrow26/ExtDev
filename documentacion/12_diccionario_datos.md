@@ -1,6 +1,6 @@
 # Diccionario de datos
 
-**Generado automáticamente desde `config/contrato_datos.yaml` con `python tools/generar_diccionario.py`. No se edita a mano.**
+**Generado automáticamente desde el contrato de datos del repositorio de trabajo. No se edita a mano. La columna "script" indica el programa del repositorio de trabajo que produce cada tabla.**
 El contrato narrativo y las reglas de uso están en `documentacion/01_contrato_datos.md`; las cifras y su estado de validación, en `documentacion/11_cifras_verificadas.md`.
 
 **Zona horaria:** Hora local de la planta, sin zona declarada por el SCADA (no hay cambio de horario en Colombia).
