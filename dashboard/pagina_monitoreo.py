@@ -83,7 +83,7 @@ def _tarjetas(motor: MotorEnVivo) -> None:
             elif c.horas_sin_dato:
                 st.caption(f"{int(c.horas_sin_dato)} h sin dato todavía")
             if s.indicativo:
-                st.caption("⚠ Modelo de confianza baja: indicativo")
+                st.caption("Indicativo", help="Modelo de confianza baja: sirve de referencia, pero no conviene decidir solo con este dato.")
             if s.color == "gris":
                 st.caption("Dato incompleto")
 
